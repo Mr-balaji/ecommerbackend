@@ -36,7 +36,7 @@ router.post("/resister",async(req,res)=>{
                 res.send({message:"resister successful"});
                  console.log(mainuser);
               }else{
-                  res.send({message:"resister successful"});
+                  res.send({message:"resister successfuls"});
                   console.log(mainuser);
               }
           })
