@@ -79,7 +79,7 @@ router.post("/adminlogin",async(req,res)=>{
   const email = req.body.email; 
   const password= req.body.password;
 
-  const secretKey = "tokenkey"
+  const secretKey = "admintokenkey"
 
 //    console.log(email);
   
