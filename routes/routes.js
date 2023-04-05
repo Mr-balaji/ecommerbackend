@@ -4,6 +4,8 @@ const app = express();
 const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
 
+const adminlogin = require("../models/Admin")
+
 
 const User = require('../models/User');
 
@@ -70,5 +72,33 @@ router.post("/login",async(req,res)=>{
    })
   
 })
+
+router.post("/adminlogin",async(req,res)=>{
+ 
+ 
+  const email = req.body.email; 
+  const password= req.body.password;
+
+  const secretKey = "tokenkey"
+
+//    console.log(email);
+  
+  adminlogin.findOne({email:email,password:password},async(err,user) => {
+      if(user){
+          
+          console.log(user);
+
+          const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+
+          await adminlogin.updateOne({ _id: user._id }, { $set: { token } });
+          res.send({"message":"User Login Successful",user,token});
+    
+      }else{
+          res.send({"message":"User Not Found"})
+      }
+   })
+  
+})
+
 
 module.exports = router;
