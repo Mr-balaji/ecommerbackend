@@ -100,5 +100,25 @@ router.post("/adminlogin",async(req,res)=>{
   
 })
 
+// Create an API endpoint to get the user count
+router.get('/api/users/count', async (req, res) => {
+  try {
+    const count = await usermodal.countDocuments();
+    const userData = await usermodal.aggregate([
+        {
+          $group: {
+            _id: { $month: '$createdAt' },
+            count: { $sum: 1 }
+          }
+        }
+      ]);
+    res.json({ userData,count });
+    console.log(count);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 
 module.exports = router;
