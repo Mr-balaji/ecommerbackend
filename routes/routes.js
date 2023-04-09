@@ -2,6 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
+const moment = require("moment");
 
 const adminlogin = require("../models/Admin")
 
@@ -124,19 +125,24 @@ router.get('/api/users/count', async (req, res) => {
     const users = await usermodal.aggregate([
       {
         $group: {
-          _id: { month: { $month: "$registerdate" } },
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $project: {
-          month: "$_id.month",
-          count: 1,
-          _id: 0
+          _id: {
+            $month: "$registerdate"
+          },
+          count: {
+            $sum: 1
+          }
         }
       }
     ]);
-    res.json({users});
+
+    const chartData = [];
+    for (let i = 0; i < 12; i++) {
+      const month = moment().month(i);
+      const monthName = month.format("MMMM");
+      const count = users.find((item) => item._id === i + 1)?.count || 0;
+      chartData.push({ month: monthName, count: count });
+    }
+    res.json(chartData);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
