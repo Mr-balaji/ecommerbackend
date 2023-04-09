@@ -114,7 +114,22 @@ router.post("/adminlogin",async(req,res)=>{
 router.get('/api/users/count', async (req, res) => {
   try {
     const count = await usermodal.countDocuments();
-    res.json({ count });
+    const users = await User.aggregate([
+      {
+        $group: {
+          _id: { month: { $month: "$registerdate" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          month: "$_id.month",
+          count: 1,
+          _id: 0
+        }
+      }
+    ]);
+    res.json({users});
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
