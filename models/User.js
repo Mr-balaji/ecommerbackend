@@ -13,13 +13,15 @@ const userSchema = mongoose.Schema({
         type:String,
         require:true
     },
+    registerdate: { type: Date, default: Date.now },
+    registermonth: { type: Number, required: true },
+    
     token: String,
-    // isadmin:{
-    //     type:Boolean,
-    //     require:true
-    // },
+  
+
 
 },
+
  {
     writeConcern: {
        w: 'majority',

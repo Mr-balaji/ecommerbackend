@@ -1,6 +1,5 @@
 const express = require("express");
 const router = new express.Router();
-const app = express();
 const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
 
@@ -19,10 +18,18 @@ router.post("/resister",async(req,res)=>{
   const email = req.body.email; 
   const password= req.body.password;
 
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; 
+
+
+
+
+
   
    usermodal.findOne({email:email},(err,user) => {
       if(user){
-          res.send({message:"user already resiste"});
+          res.send({message:"user already resister"});
           console.log("user already resister");
       }else{
           const mainuser = new usermodal(
@@ -30,16 +37,20 @@ router.post("/resister",async(req,res)=>{
                   name,
                   email,
                   password,
+                  registerdate: now,
+                  registermonth: currentMonth,
               }
           )
 
           mainuser.save(err =>{
               if(err){
-                res.send({message:"resister successful"});
-                 console.log(mainuser);
+                res.send({message:"not resister successful"});
+                //  console.log(mainuser);
               }else{
                   res.send({message:"resister successfuls"});
-                  console.log(mainuser);
+                  // console.log(mainuser);
+                  console.log(now);
+                  console.log(currentMonth);
               }
           })
       }
@@ -101,19 +112,33 @@ router.post("/adminlogin",async(req,res)=>{
 })
 
 // Create an API endpoint to get the user count
-router.get('/api/users/count', async (req, res) => {
+router.post('/api/users/count', async (req, res) => {
   try {
     const count = await usermodal.countDocuments();
-    const userData = await usermodal.aggregate([
+    // const userData = await usermodal.aggregate([
+    //     {
+    //       $group: {
+    //         _id: { $month: '$createdAt' },
+    //         count: { $sum: 1 }
+    //       }
+    //     }
+    //   ]);
+    
+    const users = await User.aggregate([
         {
           $group: {
-            _id: { $month: '$createdAt' },
-            count: { $sum: 1 }
-          }
-        }
+            _id: { $dateToString: { format: '%Y-%m', date: '$registeredDate' } },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            _id: 1,
+          },
+        },
       ]);
-    res.json({ userData,count });
-    console.log(count);
+    res.json({users, count });
+    console.log(users);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
