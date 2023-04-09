@@ -48,9 +48,8 @@ router.post("/resister",async(req,res)=>{
                 //  console.log(mainuser);
               }else{
                   res.send({message:"resister successfuls"});
-                  // console.log(mainuser);
-                  console.log(now);
-                  console.log(currentMonth);
+                  // console.log(now);
+                  // console.log(currentMonth);
               }
           })
       }
@@ -112,33 +111,10 @@ router.post("/adminlogin",async(req,res)=>{
 })
 
 // Create an API endpoint to get the user count
-router.post('/api/users/count', async (req, res) => {
+router.get('/api/users/count', async (req, res) => {
   try {
     const count = await usermodal.countDocuments();
-    // const userData = await usermodal.aggregate([
-    //     {
-    //       $group: {
-    //         _id: { $month: '$createdAt' },
-    //         count: { $sum: 1 }
-    //       }
-    //     }
-    //   ]);
-    
-    const users = await User.aggregate([
-        {
-          $group: {
-            _id: { $dateToString: { format: '%Y-%m', date: '$registeredDate' } },
-            count: { $sum: 1 },
-          },
-        },
-        {
-          $sort: {
-            _id: 1,
-          },
-        },
-      ]);
-    res.json({users, count });
-    console.log(users);
+    res.json({ count });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
