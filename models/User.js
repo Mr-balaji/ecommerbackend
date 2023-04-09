@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
         require:true
     },
     registerdate: { type: Date, default: Date.now },
-    registermonth: { type: Number, required: true },
+    registermonth: { type: String, required: true },
     
     token: String,
   

@@ -18,9 +18,14 @@ router.post("/resister",async(req,res)=>{
   const email = req.body.email; 
   const password= req.body.password;
 
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 
   const now = new Date();
-  const currentMonth = now.getMonth() + 1; 
+  // const currentMonth = now.getMonth() + 1; 
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+
 
 
 
@@ -38,7 +43,7 @@ router.post("/resister",async(req,res)=>{
                   email,
                   password,
                   registerdate: now,
-                  registermonth: currentMonth,
+                  registermonth: monthName,
               }
           )
 
@@ -48,6 +53,8 @@ router.post("/resister",async(req,res)=>{
                 //  console.log(mainuser);
               }else{
                   res.send({message:"resister successfuls"});
+      console.log(monthName);
+
                   // console.log(now);
                   // console.log(currentMonth);
               }
@@ -114,7 +121,7 @@ router.post("/adminlogin",async(req,res)=>{
 router.get('/api/users/count', async (req, res) => {
   try {
     const count = await usermodal.countDocuments();
-    const users = await User.aggregate([
+    const users = await usermodal.aggregate([
       {
         $group: {
           _id: { month: { $month: "$registerdate" } },
