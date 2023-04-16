@@ -4,14 +4,15 @@ const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
 const moment = require("moment");
 
+const Product = require("../models/product")
+
+const multer = require('multer');
 const adminlogin = require("../models/Admin")
-
-
 const User = require('../models/User');
 
 // router.post("/resister",async(req,res)=>{
 //    console.log("data",req.body.username);
-// })
+// }) 
 
 router.post("/resister",async(req,res)=>{
  
@@ -19,19 +20,11 @@ router.post("/resister",async(req,res)=>{
   const email = req.body.email; 
   const password= req.body.password;
 
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 
   const now = new Date();
   // const currentMonth = now.getMonth() + 1; 
   const monthName = now.toLocaleString('default', { month: 'long' });
-
-
-
-
-
-
-
   
    usermodal.findOne({email:email},(err,user) => {
       if(user){
@@ -48,7 +41,8 @@ router.post("/resister",async(req,res)=>{
               }
           )
 
-          mainuser.save(err =>{
+          mainuser.save(
+            err =>{
               if(err){
                 res.send({message:"not resister successful"});
                 //  console.log(mainuser);
@@ -121,7 +115,6 @@ router.post("/adminlogin",async(req,res)=>{
 // Create an API endpoint to get the user count
 router.get('/api/users/count', async (req, res) => {
   try {
-    const count = await usermodal.countDocuments();
     const users = await usermodal.aggregate([
       {
         $group: {
@@ -148,6 +141,110 @@ router.get('/api/users/count', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+// Create Multer file uploads
+const upload = multer({
+  limits:{
+    fileSize:1000000,
+  },
+  fileFilter(req,file,cb){
+   if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+   return cb(new Error("please upload a valid image file"))
+  }
+
+
+  cb(undefined,true);
+}
+})
+
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
+
+
+
+ 
+  
+
+
+
+
+router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
+
+  const { originalname, buffer, mimetype } = req.file;
+
+  console.log("file",req.file);
+
+ 
+
+  const  productName = req.body.productName;
+  const productDescription = req.body.productDescription; 
+  const price= req.body.price;
+  
+
+  console.log(productName);
+  const product = new Product({
+    productName,
+    productDescription,
+    price,
+    productImage: {
+      originalname,
+      mimetype,
+      buffer,
+    },
+  });
+
+   await product.save();
+
+   console.log(product);
+     res.status(201).send('Product details Added successfully');
+
+
+
+
+});
+ 
+
+
+  
+  
+
+
+
+// Route for retrieving a product
+// router.get('/products', async (req, res) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+
+//     if (!product) {
+//       return res.status(404).send('Product not found');
+//     }
+
+//     res.set('Content-Type', product.productImage.contentType);
+//     res.send({
+//       productName: product.productName,
+//       productDescription: product.productDescription,
+//       productPrice: product.productPrice,
+//       productImage: product.productImage.image.toString('base64'),
+//     });
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
+
+router.get('/products', async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.send(products);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
+module.exports = router;
+
+
+
 
 
 module.exports = router;
