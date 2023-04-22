@@ -4,15 +4,11 @@ const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
 const moment = require("moment");
 
-
-
 const Product = require("../models/product")
 
 const multer = require('multer');
 const adminlogin = require("../models/Admin")
 const User = require('../models/User');
-const upload = multer({ dest: 'uploads/' })
-
 
 // router.post("/resister",async(req,res)=>{
 //    console.log("data",req.body.username);
@@ -147,19 +143,19 @@ router.get('/api/users/count', async (req, res) => {
 });
 
 // Create Multer file uploads
-// const upload = multer({
-//   limits:{
-//     fileSize:1000000,
-//   },
-//   fileFilter(req,file,cb){
-//    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-//    return cb(new Error("please upload a valid image file"))
-//   }
+const upload = multer({
+  limits:{
+    fileSize:1000000,
+  },
+  fileFilter(req,file,cb){
+   if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+   return cb(new Error("please upload a valid image file"))
+  }
 
 
-//   cb(undefined,true);
-// }
-// })
+  cb(undefined,true);
+}
+})
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
@@ -183,9 +179,6 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
   const  productName = req.body.productName;
   const productDescription = req.body.productDescription; 
   const price= req.body.price;
-  const imgurl = req.file;
-
-  console.log(imgurl);
   
 
   console.log(productName);
@@ -198,7 +191,6 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
       mimetype,
       buffer,
     },
-    imgurl,
   });
 
    await product.save();
