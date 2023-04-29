@@ -10,6 +10,8 @@ const multer = require('multer');
 const adminlogin = require("../models/Admin")
 const User = require('../models/User');
 
+const upload = multer({dest:'uploads'})
+
 // router.post("/resister",async(req,res)=>{
 //    console.log("data",req.body.username);
 // }) 
@@ -143,19 +145,19 @@ router.get('/api/users/count', async (req, res) => {
 });
 
 // Create Multer file uploads
-const upload = multer({
-  limits:{
-    fileSize:1000000,
-  },
-  fileFilter(req,file,cb){
-   if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-   return cb(new Error("please upload a valid image file"))
-  }
+// const upload = multer({
+//   limits:{
+//     fileSize:1000000,
+//   },
+//   fileFilter(req,file,cb){
+//    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+//    return cb(new Error("please upload a valid image file"))
+//   }
 
 
-  cb(undefined,true);
-}
-})
+//   cb(undefined,true);
+// }
+// })
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
