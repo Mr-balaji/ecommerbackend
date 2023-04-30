@@ -8,7 +8,6 @@ const Product = require("../models/product")
 
 const multer = require('multer');
 const adminlogin = require("../models/Admin")
-const User = require('../models/User');
 
 const upload = multer({dest:'uploads'})
 
