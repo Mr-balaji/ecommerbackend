@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 moongose.connect(process.env.MONGODB_URL,
-    {useNewUrlParser:true,useUnifiedTopology: true ,family:4}
+    {useNewUrlParser:true}
     ).then(()=>{
         console.log("connection successfull");
     }).catch((err)=>{
