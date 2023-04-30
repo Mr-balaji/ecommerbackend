@@ -4,8 +4,8 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-moongose.connect("mongodb+srv://balajidevtar:Balaji5558@cluster0.v6tqp0a.mongodb.net/ecommercewebsite2?retryWrites=true&w=majority;",
-    {useNewUrlParser:true}
+moongose.connect(process.env.MONGODB_URL,
+    {useNewUrlParser:true,useUnifiedTopology: true ,family:4}
     ).then(()=>{
         console.log("connection successfull");
     }).catch((err)=>{
