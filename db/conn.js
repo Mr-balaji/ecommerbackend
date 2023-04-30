@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-moongose.connect(process.env.MONGODB_URL,
+moongose.connect("mongodb+srv://balajidevtar:Balaji5558@cluster0.v6tqp0a.mongodb.net/ecommercewebsite2?retryWrites=true&w=majority;",
     {useNewUrlParser:true}
     ).then(()=>{
         console.log("connection successfull");
