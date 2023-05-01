@@ -13,15 +13,10 @@ const productSchema = mongoose.Schema({
         type:String,
         required:true
     },
-    
-    productImage: {
-      originalname: String,
-      mimetype: String,
-      buffer: Buffer,
-    },
-  
-  
-    
+    productImage:{
+        type:String,
+        // required:true
+    } 
 },
  {
         writeConcern: {

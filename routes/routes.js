@@ -180,18 +180,14 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
   const  productName = req.body.productName;
   const productDescription = req.body.productDescription; 
   const price= req.body.price;
-  
+  const productImage = req.file.path;
 
   console.log(productName);
   const product = new Product({
     productName,
     productDescription,
     price,
-    productImage: {
-      originalname,
-      mimetype,
-      buffer,
-    },
+    productImage
   });
 
    await product.save();

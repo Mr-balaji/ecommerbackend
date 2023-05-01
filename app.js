@@ -14,6 +14,9 @@ app.use(require("./routes/routes"))
 dotenv.config();
 
 
+app.use("/uploads",express.static('uploads'));
+
+
 
 
 
