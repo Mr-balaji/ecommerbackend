@@ -160,7 +160,7 @@ router.get('/api/users/count', async (req, res) => {
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
-
+ 
 
 
  
@@ -236,6 +236,29 @@ router.get('/products', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
+
+
+
+// Endpoint to handle product sorting
+router.get('/productsbycategory', (req, res) => {
+  // Extract category parameter from request query
+  const { category } = req.query;
+
+  // Filter products based on category (if provided)
+  let filteredProducts = category
+    ? Product.filter(product => product.category === category)
+    : Product;
+
+  // Sort filtered products by name
+  filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Send response with sorted products
+  res.json(filteredProducts);
+});
+
+
+
 
 
 module.exports = router;
