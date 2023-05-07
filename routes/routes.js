@@ -7,7 +7,8 @@ const moment = require("moment");
 const Product = require("../models/product")
 
 const multer = require('multer');
-const adminlogin = require("../models/Admin")
+const adminlogin = require("../models/Admin");
+const product = require("../models/product");
 
 const upload = multer({dest:'uploads'})
 
@@ -243,18 +244,30 @@ router.get('/products', async (req, res) => {
 // Endpoint to handle product sorting
 router.get('/productsbycategory', (req, res) => {
   // Extract category parameter from request query
-  const { category } = req.query;
+  const category = req.query.category;
+
+  console.log(category);
+
+  try {
+    const products = Product.find({title:category})
+   console.log(products);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+
+   
+
 
   // Filter products based on category (if provided)
-  let filteredProducts = category
-    ? Product.filter(product => product.category === category)
-    : Product;
+  // let filteredProducts = category
+  //   ? Product.filter(product => product.category === category)
+  //   : Product;
 
-  // Sort filtered products by name
-  filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+  // // Sort filtered products by name
+  // // filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Send response with sorted products
-  res.json(filteredProducts);
+  // // Send response with sorted products
+  // res.json(filteredProducts);
 });
 
 
