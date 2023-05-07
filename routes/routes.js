@@ -3,6 +3,7 @@ const router = new express.Router();
 const usermodal = require("../models/User")
 const jwt = require('jsonwebtoken');
 const moment = require("moment");
+const CircularJSON = require('circular-json');
 
 const Product = require("../models/product")
 
@@ -249,8 +250,12 @@ router.get('/productsbycategory', (req, res) => {
   console.log(category);
 
   try {
-    const products = Product.find({title:category})
-   console.log(products);
+    Product.find({ productName: category }, (err, products) => {
+      if (err) throw err;
+ 
+      res.send(products)
+      console.log(products);
+  })    
   } catch (error) {
     res.status(500).send(error.message);
   }
