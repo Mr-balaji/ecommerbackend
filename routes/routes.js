@@ -6,6 +6,7 @@ const moment = require("moment");
 const CircularJSON = require('circular-json');
 
 const Product = require("../models/product")
+const Order = require("../models/buynow");
 
 const multer = require('multer');
 const adminlogin = require("../models/Admin");
@@ -13,26 +14,23 @@ const product = require("../models/product");
 
 const upload = multer({dest:'uploads'})
 
-// router.post("/resister",async(req,res)=>{
-//    console.log("data",req.body.username);
-// }) 
+
 
 router.post("/resister",async(req,res)=>{
- 
+
   const  name = req.body.name;
-  const email = req.body.email; 
+  const email = req.body.email;
   const password= req.body.password;
 
 
 
   const now = new Date();
-  // const currentMonth = now.getMonth() + 1; 
+  // const currentMonth = now.getMonth() + 1;
   const monthName = now.toLocaleString('default', { month: 'long' });
-  
+
    usermodal.findOne({email:email},(err,user) => {
       if(user){
           res.send({message:"user already resister"});
-          console.log("user already resister");
       }else{
           const mainuser = new usermodal(
               {
@@ -51,68 +49,63 @@ router.post("/resister",async(req,res)=>{
                 //  console.log(mainuser);
               }else{
                   res.send({message:"resister successfuls"});
-      console.log(monthName);
 
-                  // console.log(now);
-                  // console.log(currentMonth);
+
               }
           })
       }
    })
-  
+
 })
 
 router.post("/login",async(req,res)=>{
- 
- 
-  const email = req.body.email; 
+
+
+  const email = req.body.email;
   const password= req.body.password;
 
   const secretKey = "tokenkey"
 
-  
+
    usermodal.findOne({email:email,password:password},async(err,user) => {
       if(user){
-          
-          console.log(user);
+
 
           const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
 
           await usermodal.updateOne({ _id: user._id }, { $set: { token } });
           res.send({"message":"User Login Successful",user,token});
-    
+
       }else{
           res.send({"message":"User Not Found"})
       }
    })
-  
+
 })
 
 router.post("/adminlogin",async(req,res)=>{
- 
- 
-  const email = req.body.email; 
+
+
+  const email = req.body.email;
   const password= req.body.password;
 
   const secretKey = "admintokenkey"
 
-//    console.log(email);
-  
+
   adminlogin.findOne({email:email,password:password},async(err,user) => {
       if(user){
-          
-          console.log(user);
+
 
           const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
 
           await adminlogin.updateOne({ _id: user._id }, { $set: { token } });
           res.send({"message":"User Login Successful",user,token});
-    
+
       }else{
           res.send({"message":"User Not Found"})
       }
    })
-  
+
 })
 
 // Create an API endpoint to get the user count
@@ -145,6 +138,8 @@ router.get('/api/users/count', async (req, res) => {
   }
 });
 
+router.get('/')
+
 // Create Multer file uploads
 // const upload = multer({
 //   limits:{
@@ -162,11 +157,13 @@ router.get('/api/users/count', async (req, res) => {
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
- 
 
 
- 
-  
+
+
+
+
+
 
 
 
@@ -175,37 +172,31 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
 
   const { originalname, buffer, mimetype } = req.file;
 
-  console.log("file",req.file);
+  // console.log("file",req.file);
 
- 
+
 
   const  productName = req.body.productName;
-  const productDescription = req.body.productDescription; 
+  const productDescription = req.body.productDescription;
   const price= req.body.price;
   const productImage = req.file.path;
 
-  console.log(productName);
+  // console.log(productName);
   const product = new Product({
     productName,
     productDescription,
     price,
     productImage
   });
-
    await product.save();
-
-   console.log(product);
+  //  console.log(product);
      res.status(201).send('Product details Added successfully');
-
-
-
-
 });
- 
 
 
-  
-  
+
+
+
 
 
 
@@ -247,20 +238,70 @@ router.get('/productsbycategory', (req, res) => {
   // Extract category parameter from request query
   const category = req.query.category;
 
-  console.log(category);
+  // console.log(category);
 
   try {
     Product.find({ productName: category }, (err, products) => {
       if (err) throw err;
- 
+
       res.send(products)
-      console.log(products);
-  })    
+      // console.log(products);
+  })
   } catch (error) {
     res.status(500).send(error.message);
   }
 
-   
+
+  router.get("/buynowbyid",async(req,res)=>{
+    const id = req.query.id
+
+    // console.log("id",id);
+
+    try {
+      Product.find({ _id: id }, (err, products) => {
+        if (err) throw err;
+
+        res.send(products)
+        // console.log(products);
+    })
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+
+
+ })
+
+ router.post("/buynow",async(req,res)=>{
+  const productName = req.body[0].productName
+  const  productDescription = req.body[0].productDescription
+  const productPrice = req.body[0].productPrice
+  const quantity = req.body[0].quantity
+  // const productData = req.body[0];
+  // const productName = productData.map((product) => product.productName);
+  // const productDescription = productData.map((product) => product.productDescription);
+  // const productPrice = productData.map((product) => product.productPrice);
+  // const quantity = productData.map((product) => product.quantity);
+
+
+
+
+  console.log("id",productName);
+
+  const order = new Order({
+    productName,
+    productDescription,
+    productPrice,
+    quantity
+  });
+   await order.save();
+  //  console.log(product);
+     res.status(201).send('Product details Added successfully');
+
+
+})
+
+
+
 
 
   // Filter products based on category (if provided)
