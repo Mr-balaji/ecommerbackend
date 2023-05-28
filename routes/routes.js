@@ -15,7 +15,7 @@ const product = require("../models/product");
 const upload = multer({dest:'uploads'})
 
 
-
+//create Api For User Resister
 router.post("/resister",async(req,res)=>{
 
   const  name = req.body.name;
@@ -58,6 +58,8 @@ router.post("/resister",async(req,res)=>{
 
 })
 
+
+//create Api For User Login
 router.post("/login",async(req,res)=>{
 
 
@@ -82,6 +84,8 @@ router.post("/login",async(req,res)=>{
    })
 
 })
+
+//Api For Admin Login
 
 router.post("/adminlogin",async(req,res)=>{
 
@@ -108,7 +112,10 @@ router.post("/adminlogin",async(req,res)=>{
 
 })
 
-// Create an API endpoint to get the user count
+
+
+
+// Create an API endpoint to get the Order count
 router.get('/api/users/count', async (req, res) => {
   try {
     const users = await usermodal.aggregate([
@@ -271,34 +278,7 @@ router.get('/productsbycategory', (req, res) => {
 
  })
 
- router.post("/buynow",async(req,res)=>{
-  const productName = req.body[0].productName
-  const  productDescription = req.body[0].productDescription
-  const productPrice = req.body[0].productPrice
-  const quantity = req.body[0].quantity
-  // const productData = req.body[0];
-  // const productName = productData.map((product) => product.productName);
-  // const productDescription = productData.map((product) => product.productDescription);
-  // const productPrice = productData.map((product) => product.productPrice);
-  // const quantity = productData.map((product) => product.quantity);
 
-
-
-
-  console.log("id",productName);
-
-  const order = new Order({
-    productName,
-    productDescription,
-    productPrice,
-    quantity
-  });
-   await order.save();
-  //  console.log(product);
-     res.status(201).send('Product details Added successfully');
-
-
-})
 
 
 
@@ -315,6 +295,61 @@ router.get('/productsbycategory', (req, res) => {
   // // Send response with sorted products
   // res.json(filteredProducts);
 });
+
+router.post("/buynow",async(req,res)=>{
+  const productName = req.body[0].productName
+  const  productDescription = req.body[0].productDescription
+  const productPrice = req.body[0].productPrice
+  const quantity = req.body[0].quantity
+  const now = new Date();
+  // const currentMonth = now.getMonth() + 1;
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+
+  const order = new Order({
+    productName,
+    productDescription,
+    productPrice,
+    quantity,
+    registerdate: now,
+    registermonth: monthName,
+  });
+   await order.save();
+  //  console.log(product);
+     res.status(201).send('Product details Added successfully');
+
+
+})
+
+router.get('/ordercount', async (req, res) => {
+  try {
+    const order = await Order.aggregate([
+      {
+        $group: {
+          _id: {
+            $month: "$registerdate"
+          },
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
+
+    const chartData = [];
+    for (let i = 0; i < 12; i++) {
+      const month = moment().month(i);
+      const monthName = month.format("MMMM");
+      const count = order.find((item) => item._id === i + 1)?.count || 0;
+      chartData.push({ month: monthName, count: count });
+    }
+    res.json(chartData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 
 
 

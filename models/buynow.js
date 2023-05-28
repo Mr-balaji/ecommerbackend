@@ -16,7 +16,9 @@ const buyNowSchema = mongoose.Schema({
 
     quantity:{
        type:String
-    }
+    },
+    registerdate: { type: Date, default: Date.now },
+    registermonth: { type: String, required: true },
 },
  {
         writeConcern: {
