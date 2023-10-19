@@ -72,7 +72,6 @@ router.post("/login",async(req,res)=>{
    usermodal.findOne({email:email,password:password},async(err,user) => {
       if(user){
 
-
           const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
 
           await usermodal.updateOne({ _id: user._id }, { $set: { token } });
@@ -95,10 +94,8 @@ router.post("/adminlogin",async(req,res)=>{
 
   const secretKey = "admintokenkey"
 
-
   adminlogin.findOne({email:email,password:password},async(err,user) => {
       if(user){
-
 
           const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
 
@@ -179,7 +176,6 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
 
   const { originalname, buffer, mimetype } = req.file;
 
-  // console.log("file",req.file);
 
 
 
@@ -188,7 +184,6 @@ router.post("/addproducts",upload.single('productImg'),async(req,res)=>{
   const price= req.body.price;
   const productImage = req.file.path;
 
-  // console.log(productName);
   const product = new Product({
     productName,
     productDescription,
@@ -237,6 +232,44 @@ router.get('/products', async (req, res) => {
   }
 });
 
+// update Records
+router.put('/api/product/:id', (req, res) => {
+  const id = req.params.id;
+  const updateData = req.body;
+
+  Product.findByIdAndUpdate(
+    id,
+    updateData,
+    { new: true },
+    (err, updatedDocument) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json(updatedDocument);
+      }
+    }
+  );
+});
+
+
+
+
+
+// delete Records
+router.delete('/api/product/:id', (req, res) => {
+  const id = req.params.id;
+
+  Product.findByIdAndRemove(id, (err, removedDocument) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (!removedDocument) {
+      res.status(404).json({ error: 'Document not found' });
+    } else {
+      res.json({ message: 'Document deleted successfully' });
+    }
+  });
+});
+
 
 
 
@@ -252,34 +285,11 @@ router.get('/productsbycategory', (req, res) => {
       if (err) throw err;
 
       res.send(products)
-      // console.log(products);
+      console.log(products);
   })
   } catch (error) {
     res.status(500).send(error.message);
   }
-
-
-  router.get("/buynowbyid",async(req,res)=>{
-    const id = req.query.id
-
-    // console.log("id",id);
-
-    try {
-      Product.find({ _id: id }, (err, products) => {
-        if (err) throw err;
-
-        res.send(products)
-        // console.log(products);
-    })
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-
-
- })
-
-
-
 
 
 
@@ -355,7 +365,6 @@ router.get('/ordercount', async (req, res) => {
 
 
 
-module.exports = router;
 
 
 
